@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-CHASTE VERTEXCOMPARISON2012 PROJECT FOLDER
+CHASTE VERTEXCOMPARISON2013 PROJECT FOLDER
 
 A collection of test script files and their results, which 
 use the central chaste cancer code to recreate the results 
