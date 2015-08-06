@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,27 +41,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+#include "SmartPointers.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "SimpleWntUniformDistCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "NagaiHondaMPhaseGrowthForce.hpp"
+#include "NagaiHondaForce.hpp"
+#include "MPhaseGrowthTargetAreaModifier.hpp"
 #include "ModifiedWelikyOsterForce.hpp"
 #include "VertexAngleForce.hpp"
 #include "PlaneBasedCellKiller.hpp"
-
 #include "StochasticDurationCellCycleModel.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "ObstructionBoundaryCondition.hpp"
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "NodeVelocityWriter.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "SmartPointers.hpp"
-#include "Debug.hpp"
-
 
 /**********************************************
- * THIS TEST WORKS WITH RELEASE 3.0 OF CHASTE *
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
  **********************************************/
 
 class TestVertexRestrictedGeometry: public AbstractCellBasedTestSuite
@@ -101,21 +107,34 @@ public:
 
         // Create a vertex-based cell population and set up a cell-based simulation
         VertexBasedCellPopulation<2> population(*p_mesh, cells);
+
+        // Specify what to output from the simulation
+        population.AddCellWriter<CellAgesWriter>();
+        population.AddCellWriter<CellAncestorWriter>();
+        population.AddCellWriter<CellIdWriter>();
+        population.AddCellWriter<CellMutationStatesWriter>();
+        population.AddCellWriter<CellProliferativePhasesWriter>();
+        population.AddCellWriter<CellProliferativeTypesWriter>();
+        population.AddCellWriter<CellVolumesWriter>();
+        population.AddPopulationWriter<NodeVelocityWriter>();
+
+        // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(population);
         simulator.SetOutputDirectory("TestVertexObstruction");
         simulator.SetDt(0.001);
         simulator.SetEndTime(100.0);
         simulator.SetSamplingTimestepMultiple(1000);
-        simulator.SetOutputNodeVelocities(true);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaMPhaseGrowthForce<2>, p_force);
+        MAKE_PTR(NagaiHondaForce<2>, p_force);
         p_force->SetNagaiHondaDeformationEnergyParameter(55.0);          // lambda
-        p_force->SetMatureCellTargetArea(1.0);                           // A_0
         p_force->SetNagaiHondaMembraneSurfaceEnergyParameter(0.0);       // beta
         p_force->SetNagaiHondaCellCellAdhesionEnergyParameter(5.0);      // gamma_cell
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(10.0); // gamma_boundary
         simulator.AddForce(p_force);
+
+        MAKE_PTR(MPhaseGrowthTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Create cell killer for y = 12 and pass to the simulation
         c_vector<double, 2> point1 = zero_vector<double>(2);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,8 @@ used in the tests:
 
 	* ModifiedWelikyOsterForce
 	* MotileCellForce
+    * MphaseGrowthTargerAreaModifer
 	* NagaiHondaDifferentialAdhesionForce
-	* NagaiHondaMPhaseGrowthForce
 	* ObstructionBoundaryCondition
 	* SimpleVolumeBasedStochasticCellCycleModel
 	* SimpleWntUniformDistCellCycleModel
@@ -67,8 +67,5 @@ manuscript:
 	* TestVertexRestrictedGeometry
 	* TestVertexWoundHeal
 
-
-
-
-
-
+Please note that this code works with Chaste version 3.3 and hence differs from the 
+code described in the published manuscript (which worked with Chaste version 3.1).

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,6 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
+
 #ifndef MOTILECELLFORCE_HPP_
 #define MOTILECELLFORCE_HPP_
 
@@ -48,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A motile cell force class.
  */
 template<unsigned DIM>
-class MotileCellForce  : public AbstractForce<DIM>
+class MotileCellForce : public AbstractForce<DIM>
 {
 private:
 
@@ -74,7 +78,7 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * @param rCellPopulation reference to the cell population
+     * @param rCellPopulation a cell population object
      */
     void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,6 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
+
 #include "SimpleWntUniformDistCellCycleModel.hpp"
 #include "Exception.hpp"
 
@@ -43,7 +47,6 @@ SimpleWntUniformDistCellCycleModel::SimpleWntUniformDistCellCycleModel()
       mWntLabelledThreshold(0.65)
 {
 }
-
 
 AbstractCellCycleModel* SimpleWntUniformDistCellCycleModel::CreateCellCycleModel()
 {
@@ -77,7 +80,6 @@ AbstractCellCycleModel* SimpleWntUniformDistCellCycleModel::CreateCellCycleModel
 
     return p_model;
 }
-
 
 void SimpleWntUniformDistCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(bool useCellProliferativeTypeDependentG1Duration)
 {

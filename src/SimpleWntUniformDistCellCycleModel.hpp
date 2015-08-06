@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,6 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
+
 #ifndef SIMPLEWNTUNIFORMDISTCELLCYCLEMODEL_HPP_
 #define SIMPLEWNTUNIFORMDISTCELLCYCLEMODEL_HPP_
 
@@ -47,9 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 
-
 /**
- *  Simple Wnt-dependent cell-cycle model with Uniform Distrubuted Cell Cycle Duration.
+ * Simple Wnt-dependent cell-cycle model with Uniform Distrubuted Cell Cycle Duration.
  */
 class SimpleWntUniformDistCellCycleModel : public AbstractSimpleCellCycleModel
 {

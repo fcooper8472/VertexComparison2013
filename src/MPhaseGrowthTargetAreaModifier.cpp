@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,27 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "NagaiHondaMPhaseGrowthForce.hpp"
+#include "MPhaseGrowthTargetAreaModifier.hpp"
 
 template<unsigned DIM>
-NagaiHondaMPhaseGrowthForce<DIM>::NagaiHondaMPhaseGrowthForce()
-   : NagaiHondaForce<DIM>()
+MPhaseGrowthTargetAreaModifier<DIM>::MPhaseGrowthTargetAreaModifier()
+    : AbstractTargetAreaModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-NagaiHondaMPhaseGrowthForce<DIM>::~NagaiHondaMPhaseGrowthForce()
+MPhaseGrowthTargetAreaModifier<DIM>::~MPhaseGrowthTargetAreaModifier()
 {
 }
 
-
 template<unsigned DIM>
-double NagaiHondaMPhaseGrowthForce<DIM>::GetTargetAreaOfCell(const CellPtr pCell) const
+void MPhaseGrowthTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
 {
     // Get target area A of a healthy cell in S, G2 or M phase
-    double cell_target_area = this->GetMatureCellTargetArea();
+    double cell_target_area = this->mReferenceTargetArea;
 
-    double cell_age = pCell->GetAge();
     double m_duration = pCell->GetCellCycleModel()->GetMDuration();
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
@@ -75,33 +73,31 @@ double NagaiHondaMPhaseGrowthForce<DIM>::GetTargetAreaOfCell(const CellPtr pCell
     }
     else
     {
-        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the M phase
+        double cell_age = pCell->GetAge();
+
+        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
         if (cell_age < m_duration)
         {
             cell_target_area *= 0.5*(1 + cell_age/m_duration);
         }
     }
 
-    return cell_target_area;
+    // Set cell data
+    pCell->GetCellData()->SetItem("target area", cell_target_area);
 }
 
 template<unsigned DIM>
-void NagaiHondaMPhaseGrowthForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void MPhaseGrowthTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    // Call method on direct parent class
-    NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
+    // No parameters to output, so just call method on direct parent class
+    AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
-template class NagaiHondaMPhaseGrowthForce<1>;
-template class NagaiHondaMPhaseGrowthForce<2>;
-template class NagaiHondaMPhaseGrowthForce<3>;
-
+template class MPhaseGrowthTargetAreaModifier<1>;
+template class MPhaseGrowthTargetAreaModifier<2>;
+template class MPhaseGrowthTargetAreaModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(NagaiHondaMPhaseGrowthForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(MPhaseGrowthTargetAreaModifier)

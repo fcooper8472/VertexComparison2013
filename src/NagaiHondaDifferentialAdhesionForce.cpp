@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,10 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
 
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "CellLabel.hpp"
@@ -175,10 +179,7 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::OutputForceParameters(out_stream&
 	NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class NagaiHondaDifferentialAdhesionForce<1>;
 template class NagaiHondaDifferentialAdhesionForce<2>;
 template class NagaiHondaDifferentialAdhesionForce<3>;

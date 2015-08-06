@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,6 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
+
 #ifndef TESTVERTEXACTIVEMIGRATION_HPP_
 #define TESTVERTEXACTIVEMIGRATION_HPP_
 
@@ -41,25 +45,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-
+#include "SmartPointers.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NagaiHondaForce.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "ModifiedWelikyOsterForce.hpp"
 #include "VertexAngleForce.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "CellLabel.hpp"
 #include "MotileCellForce.hpp"
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "SmartPointers.hpp"
-
-
-/**********************************************
- * THIS TEST WORKS WITH RELEASE 3.0 OF CHASTE *
- **********************************************/
 
 class TestVertexActiveMigration: public AbstractCellBasedTestSuite
 {
@@ -159,20 +165,22 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells,p_mesh->GetNumElements(), p_diff_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create pointer to a labelled cell state
         boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
 
         // Create cell population
         VertexBasedCellPopulation<2> population(*p_mesh, cells);
-        population.SetOutputCellIdData(true);
-        population.SetOutputCellMutationStates(true);
-        population.SetOutputCellAncestors(true);
-        population.SetOutputCellProliferativeTypes(true);
-        population.SetOutputCellVariables(true);
-        population.SetOutputCellCyclePhases(true);
-        population.SetOutputCellAges(true);
+
+        // Specify what to output from the simulation
+        population.AddCellWriter<CellAgesWriter>();
+        population.AddCellWriter<CellAncestorWriter>();
+        population.AddCellWriter<CellIdWriter>();
+        population.AddCellWriter<CellMutationStatesWriter>();
+        population.AddCellWriter<CellProliferativePhasesWriter>();
+        population.AddCellWriter<CellProliferativeTypesWriter>();
+        population.AddCellWriter<CellVolumesWriter>();
 
         // Now label cells in a given region as motile using a helper method
         LabelMotileRegionInCellPopulation(population, 0.4472, 1.5, 5.0);
@@ -191,6 +199,9 @@ public:
         p_force->SetNagaiHondaCellCellAdhesionEnergyParameter(5.0);
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(10.0);
         simulator.AddForce(p_force);
+
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         double box_height = 10.0;
         double box_width = 20.0;

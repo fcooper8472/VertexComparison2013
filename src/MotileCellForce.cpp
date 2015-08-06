@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,6 +32,10 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+/**********************************************
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
+ **********************************************/
 
 #include "MotileCellForce.hpp"
 #include "CellLabel.hpp"
@@ -93,7 +97,7 @@ void MotileCellForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             force(1) = 0.0;
             force(0) = 0.1/dt;
 
-            rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
+            p_cell_population->GetNode(node_index)->AddAppliedForceContribution(force);
         }
     }
 }
@@ -105,10 +109,7 @@ void MotileCellForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class MotileCellForce<1>;
 template class MotileCellForce<2>;
 template class MotileCellForce<3>;

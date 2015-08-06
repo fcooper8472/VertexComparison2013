@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
+#include "SmartPointers.hpp"
 
 #include "OffLatticeSimulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -47,14 +48,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "VertexDiffusionForce.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "CellLabel.hpp"
-#include "SmartPointers.hpp"
-
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "AbstractCellBasedTestSuite.hpp"
 
 /**********************************************
- * THIS TEST WORKS WITH RELEASE 3.0 OF CHASTE *
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
  **********************************************/
 
 /**
@@ -121,16 +128,15 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> population(*p_mesh, cells);
-        
-        // Set population to output all data to results files
-        population.SetOutputCellIdData(true);
-        population.SetOutputCellMutationStates(true);
-        population.SetOutputCellAncestors(true);
-        population.SetOutputCellProliferativeTypes(true);
-        population.SetOutputCellVariables(true);
-        population.SetOutputCellCyclePhases(true);
-        population.SetOutputCellAges(true);
-        population.SetOutputCellVolumes(true);
+
+        // Specify what to output from the simulation
+        population.AddCellWriter<CellAgesWriter>();
+        population.AddCellWriter<CellAncestorWriter>();
+        population.AddCellWriter<CellIdWriter>();
+        population.AddCellWriter<CellMutationStatesWriter>();
+        population.AddCellWriter<CellProliferativePhasesWriter>();
+        population.AddCellWriter<CellProliferativeTypesWriter>();
+        population.AddCellWriter<CellVolumesWriter>();
 
         // Set up cell-based simulation and output directory
         OffLatticeSimulation<2> simulator(population);
@@ -138,7 +144,7 @@ public:
 
         // Set time step and end time for simulation
         simulator.SetDt(0.001);
-        simulator.SetEndTime(70.0); //70
+        simulator.SetEndTime(70.0);
 
         // Only record results every 100 time steps
         simulator.SetSamplingTimestepMultiple(100);
@@ -153,7 +159,10 @@ public:
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(12.0);
         p_force->SetNagaiHondaLabeledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
-        
+
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Add some random motion to vertices
         MAKE_PTR_ARGS(VertexDiffusionForce<2>, p_random_force, (0.02));
         simulator.AddForce(p_random_force);

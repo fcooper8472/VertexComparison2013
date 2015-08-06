@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,19 +41,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+#include "SmartPointers.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NagaiHondaForce.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "WelikyOsterForce.hpp"
 #include "ModifiedWelikyOsterForce.hpp"
 #include "PlaneBoundaryCondition.hpp"
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "NodeVelocityWriter.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "SmartPointers.hpp"
 
 /**********************************************
- * THIS TEST WORKS WITH RELEASE 3.0 OF CHASTE *
+ * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
  **********************************************/
 
 /**
@@ -169,6 +178,16 @@ public:
         // Create cell population
         VertexBasedCellPopulation<2> population(*p_mesh, cells);
 
+        // Specify what to output from the simulation
+        population.AddCellWriter<CellAgesWriter>();
+        population.AddCellWriter<CellAncestorWriter>();
+        population.AddCellWriter<CellIdWriter>();
+        population.AddCellWriter<CellMutationStatesWriter>();
+        population.AddCellWriter<CellProliferativePhasesWriter>();
+        population.AddCellWriter<CellProliferativeTypesWriter>();
+        population.AddCellWriter<CellVolumesWriter>();
+        population.AddPopulationWriter<NodeVelocityWriter>();
+
         // Set up a cell-based simulation, output directory, time step and end time
         OffLatticeSimulation<2> simulator(population);
         simulator.SetOutputDirectory("TestWoundHealing/NagaiHonda");
@@ -179,11 +198,13 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         p_force->SetNagaiHondaDeformationEnergyParameter(55.0);          // lambda
-        p_force->SetMatureCellTargetArea(1.0);                           // A_0
         p_force->SetNagaiHondaMembraneSurfaceEnergyParameter(0.0);       // beta
         p_force->SetNagaiHondaCellCellAdhesionEnergyParameter(5.0);      // gamma_cell
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(10.0); // gamma_boundary
         simulator.AddForce(p_force);
+
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Create boundary condition y > 0
         c_vector<double, 2> point1 = zero_vector<double>(2);
@@ -228,7 +249,7 @@ public:
         // Reset timestep, sampling timestep and end time for simulation and run for a further duration
         simulator.SetDt(0.005);
         simulator.SetSamplingTimestepMultiple(20);
-        simulator.SetEndTime(60.0); //60
+        simulator.SetEndTime(60.0);
         simulator.Solve();
     }
 

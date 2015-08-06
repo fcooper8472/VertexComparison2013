@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,75 +33,63 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef NAGAIHONDAMPHASEGROWTHFORCE_HPP_
-#define NAGAIHONDAMPHASEGROWTHFORCE_HPP_
+#ifndef MPHASEGROWTHTARGETAREAMODIFIER_HPP_
+#define MPHASEGROWTHTARGETAREAMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-
-#include "NagaiHondaForce.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-#include <iostream>
+#include "AbstractTargetAreaModifier.hpp"
 
 /**
- * A force class for use in vertex-based simulations, based on a mechanical
- * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
- * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
- *
- * Each of the model parameter member variables are rescaled such that mDampingConstantNormal
- * takes the default value 1, whereas Nagai and Honda (who denote the parameter by
- * nu) take the value 0.01.
+ * A modifier class in which the target area property of each cell is updated.
+ * It is used to implement cell growth during M phase in vertex-based simulations.
  */
 template<unsigned DIM>
-class NagaiHondaMPhaseGrowthForce  : public NagaiHondaForce<DIM>
+class MPhaseGrowthTargetAreaModifier : public AbstractTargetAreaModifier<DIM>
 {
-friend class TestForces;
-
-private:
-
+    /** Needed for serialization. */
     friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<NagaiHondaForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
     }
 
 public:
 
     /**
-     * Constructor.
+     * Default constructor.
      */
-    NagaiHondaMPhaseGrowthForce();
+    MPhaseGrowthTargetAreaModifier();
 
     /**
      * Destructor.
      */
-    ~NagaiHondaMPhaseGrowthForce();
+    virtual ~MPhaseGrowthTargetAreaModifier();
 
     /**
-     * Overridden GetTargetAreaOfCell method which has cells growing over the M phase
-     * duration only.
+     * Overridden UpdateTargetAreaOfCell() method.
      *
-     * Get the target area of a given cell. This grows linearly from
-     * 0.5*A to A during the M phase of the cell cycle, then remains
-     * at A for the rest of the cell cycle, where A denotes the
-     * member variable mMatureCellTargetArea.
-     *
-     * @param pCell the cell
-     * @return the cell's target area
+     * @param pCell pointer to the cell
      */
-    double GetTargetAreaOfCell(const CellPtr pCell) const;
+    virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
 
     /**
-     * Overridden OutputForceParameters() method.
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(NagaiHondaMPhaseGrowthForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(MPhaseGrowthTargetAreaModifier)
 
-#endif /*NAGAIHONDAMPHASEGROWTHFORCE_HPP_*/
+#endif /*MPHASEGROWTHTARGETAREAMODIFIER_HPP_*/
