@@ -33,16 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**********************************************
- * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
- **********************************************/
-
 #include "SimpleVolumeBasedStochasticCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
+
+#include "CellLabel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "Exception.hpp"
+#include "RandomNumberGenerator.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 
 SimpleVolumeBasedStochasticCellCycleModel::SimpleVolumeBasedStochasticCellCycleModel()
     : mQuiescentVolumeFraction(0.7)
@@ -170,6 +168,14 @@ void SimpleVolumeBasedStochasticCellCycleModel::SetQuiescentVolumeFraction(doubl
 double SimpleVolumeBasedStochasticCellCycleModel::GetQuiescentVolumeFraction()
 {
     return mQuiescentVolumeFraction;
+}
+
+void SimpleVolumeBasedStochasticCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<QuiescentVolumeFraction>" << mQuiescentVolumeFraction << "</QuiescentVolumeFraction>\n";
+
+    // Call method on direct parent class
+    AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

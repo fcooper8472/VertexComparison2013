@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MPhaseGrowthTargetAreaModifier.hpp"
 
+#include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "ApoptoticCellProperty.hpp"
+
 template<unsigned DIM>
 MPhaseGrowthTargetAreaModifier<DIM>::MPhaseGrowthTargetAreaModifier()
     : AbstractTargetAreaModifier<DIM>()
@@ -52,7 +55,9 @@ void MPhaseGrowthTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-    double m_duration = pCell->GetCellCycleModel()->GetMDuration();
+    const auto& p_cell_cycle_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+
+    double m_duration = p_cell_cycle_model->GetMDuration();
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {

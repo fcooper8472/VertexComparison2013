@@ -33,12 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**********************************************
- * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
- **********************************************/
-
 #include "SimpleWntUniformDistCellCycleModel.hpp"
+
 #include "Exception.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 SimpleWntUniformDistCellCycleModel::SimpleWntUniformDistCellCycleModel()
     : mUseCellProliferativeTypeDependentG1Duration(false),
@@ -46,6 +46,8 @@ SimpleWntUniformDistCellCycleModel::SimpleWntUniformDistCellCycleModel()
       mWntTransitThreshold(0.65),
       mWntLabelledThreshold(0.65)
 {
+    this->SetMinCellCycleDuration(10.0);
+    this->SetMaxCellCycleDuration(14.0);
 }
 
 AbstractCellCycleModel* SimpleWntUniformDistCellCycleModel::CreateCellCycleModel()
@@ -65,15 +67,7 @@ AbstractCellCycleModel* SimpleWntUniformDistCellCycleModel::CreateCellCycleModel
      * may be set/overwritten as soon as InitialiseDaughterCell() is called on
      * the new cell-cycle model.
      */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetUseCellProliferativeTypeDependentG1Duration(mUseCellProliferativeTypeDependentG1Duration);
+
     p_model->SetWntStemThreshold(mWntStemThreshold);
     p_model->SetWntTransitThreshold(mWntTransitThreshold);
     p_model->SetWntLabelledThreshold(mWntLabelledThreshold);
@@ -85,45 +79,6 @@ void SimpleWntUniformDistCellCycleModel::SetUseCellProliferativeTypeDependentG1D
 {
     mUseCellProliferativeTypeDependentG1Duration = useCellProliferativeTypeDependentG1Duration;
 }
-
-void SimpleWntUniformDistCellCycleModel::SetG1Duration()
-{
-    assert(mpCell != NULL);
-
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
-    {
-        if (mUseCellProliferativeTypeDependentG1Duration)
-         {
-             mG1Duration = GetStemCellG1Duration() + 4*p_gen->ranf(); //  U[0,4] so U[10,14] overall with default params
-         }
-         else
-         {
-             // Normally stem cells should behave just like transit cells in a Wnt simulation
-             mG1Duration = GetTransitCellG1Duration() + 4*p_gen->ranf(); // U[0,4] so U[10,14] overall with default params
-         }
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration() + 4*p_gen->ranf(); //  U[0,4] so U[10,14] overall with default params
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mG1Duration = DBL_MAX;
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-
-    // Check that the normal random deviate has not returned a small or negative G1 duration
-    if (mG1Duration < mMinimumGapDuration)
-    {
-        mG1Duration = mMinimumGapDuration;
-    }
-}
-
 
 double SimpleWntUniformDistCellCycleModel::GetWntLevel()
 {
@@ -256,7 +211,7 @@ void SimpleWntUniformDistCellCycleModel::UpdateCellCyclePhase()
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+//    AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 }
 
 void SimpleWntUniformDistCellCycleModel::InitialiseDaughterCell()

@@ -33,14 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**********************************************
- * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
- **********************************************/
-
 #ifndef SIMPLEWNTUNIFORMDISTCELLCYCLEMODEL_HPP_
 #define SIMPLEWNTUNIFORMDISTCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "WntConcentration.hpp"
 
@@ -54,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Simple Wnt-dependent cell-cycle model with Uniform Distrubuted Cell Cycle Duration.
  */
-class SimpleWntUniformDistCellCycleModel : public AbstractSimpleCellCycleModel
+class SimpleWntUniformDistCellCycleModel : public UniformCellCycleModel
 {
 private:
 
@@ -114,16 +110,6 @@ protected:
      */
     WntConcentrationType GetWntType();
 
-    /**
-     * Stochastically set the G1 duration. The G1 duration is taken
-     * from a normal distribution whose mean is the G1 duration given
-     * in AbstractCellCycleModel for the cell type and whose standard deviation
-     * is 1.
-     *
-     * Called on cell creation at the start of a simulation, and for both
-     * parent and daughter cells at cell division.
-     */
-    void SetG1Duration();
 
 public:
 

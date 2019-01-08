@@ -33,14 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**********************************************
- * THIS CODE WORKS WITH RELEASE 3.3 OF CHASTE *
- **********************************************/
-
 #ifndef SIMPLEVOLUMEBASEDSTOCHASTICCELLCYCLEMODEL_HPP_
 #define SIMPLEVOLUMEBASEDSTOCHASTICCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 
 /**
  * Simple area-based  cell cycle model with a Uniform phase duration with a default distribution of U[10,14].
@@ -50,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * drops below some critical fraction of its equilibrium value, temporarily stops progressing
  * through the cell cycle.
  */
-class SimpleVolumeBasedStochasticCellCycleModel : public AbstractSimpleCellCycleModel
+class SimpleVolumeBasedStochasticCellCycleModel : public AbstractPhaseBasedCellCycleModel
 {
 private:
 
@@ -58,7 +54,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractPhaseBasedCellCycleModel>(*this);
         archive & mQuiescentVolumeFraction;
     }
 
@@ -85,13 +81,13 @@ public:
     /**
      * Overridden UpdateCellCyclePhase() method.
      */
-    void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Overridden builder method to create new instances of
      * the cell cycle model.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Set #mQuiescentVolumeFraction.
@@ -104,6 +100,13 @@ public:
      * Get #mQuiescentVolumeFraction.
      */
     double GetQuiescentVolumeFraction();
+
+    /**
+     * Overridden OutputCellCycleModelParameters() method.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer
